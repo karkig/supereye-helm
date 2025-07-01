@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: supereye-core
+spec:
+  selector:
+    app: supereye-core
+  type: NodePort
+  ports:
+    - name: supereye-core
+      port: {{ .Values.supereyeCore.service.port }}
+      targetPort: {{ .Values.supereyeCore.service.targetPort }}
+      nodePort: {{ .Values.supereyeCore.service.nodePort }}
+    - name: debug
+      port: {{ .Values.supereyeCore.service.debugPort }}
+      targetPort: {{ .Values.supereyeCore.service.debugTargetPort }}
+      nodePort: {{ .Values.supereyeCore.service.debugNodePort }}

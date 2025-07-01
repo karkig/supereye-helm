@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: emqx-server
+spec:
+  selector:
+    app: emqx-server
+  type: NodePort
+  ports:
+    - name: mqtt
+      port: {{ .Values.emqxServer.service.ports.mqtt }}
+      targetPort: {{ .Values.emqxServer.service.ports.mqtt }}
+      nodePort: {{ .Values.emqxServer.service.nodePorts.mqtt }}
+    - name: ws
+      port: {{ .Values.emqxServer.service.ports.ws }}
+      targetPort: {{ .Values.emqxServer.service.ports.ws }}
+      nodePort: {{ .Values.emqxServer.service.nodePorts.ws }}
+    - name: dashboard
+      port: {{ .Values.emqxServer.service.ports.dashboard }}
+      targetPort: {{ .Values.emqxServer.service.ports.dashboard }}
+      nodePort: {{ .Values.emqxServer.service.nodePorts.dashboard }}

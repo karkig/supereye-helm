@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: emqx-server
+  labels:
+    app: emqx-server
+spec:
+  replicas: {{ .Values.emqxServer.replicaCount }}
+  selector:
+    matchLabels:
+      app: emqx-server
+  template:
+    metadata:
+      labels:
+        app: emqx-server
+    spec:
+      containers:
+        - name: emqx-server
+          image: "{{ .Values.emqxServer.image.repository }}:{{ .Values.emqxServer.image.tag }}"
+          imagePullPolicy: {{ .Values.emqxServer.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.emqxServer.service.ports.mqtt }}
+            - containerPort: {{ .Values.emqxServer.service.ports.ws }}
+            - containerPort: {{ .Values.emqxServer.service.ports.dashboard }}

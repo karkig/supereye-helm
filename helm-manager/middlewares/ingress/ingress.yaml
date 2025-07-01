@@ -1,0 +1,43 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: super-eye-ingress
+  namespace: default
+  annotations:
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/app-root: /
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - supereye.in
+      secretName: supereye-tls
+  rules:
+    - host: supereye.in
+      http:
+        paths:
+          - path: /emx
+            pathType: Prefix
+            backend:
+              service:
+                name: emqx-server
+                port:
+                  number: 18083
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: alert-dashboard
+                port:
+                  number: 80
+          - path: /api(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: emqx-backend
+                port:
+                  number: 10001

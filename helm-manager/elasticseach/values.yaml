@@ -1,0 +1,10 @@
+elasticsearch:
+  name: elasticsearch
+  image: docker.elastic.co/elasticsearch/elasticsearch:8.13.2
+  replicas: 1
+  storage:
+    diskName: elasticsearch-disk
+    size: 10Gi
+    fsType: ext4
+    zone: us-central1-a
+    mountPath: /usr/share/elasticsearch/data

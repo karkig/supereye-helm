@@ -1,0 +1,22 @@
+supereyeCore:
+  replicaCount: 1
+  env:
+    ENABLE_NEW_FEATURE: test
+    PHONE_COLLECTION_NAME: phones-dev
+    ALERT_COLLECTION_NAME: alerts-dev
+    SENSOR_COLLECTION_NAME: sensors-dev
+    USER_COLLECTION_NAME: users-dev
+    EMQX_SERVER_HOST: emqx-server
+    EMQX_SCHEME: tcp
+  image:
+    repository: kailashkarki18/supereye-core
+    tag: latest
+    pullPolicy: Always
+  service:
+    port: 10001
+    targetPort: 10001
+    nodePort: 30001
+    mqtt: 1883
+    debugPort: 5005
+    debugTargetPort: 5005
+    debugNodePort: 30505

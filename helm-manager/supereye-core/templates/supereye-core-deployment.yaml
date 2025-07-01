@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: supereye-core
+  labels:
+    app: supereye-core
+spec:
+  replicas: {{ .Values.supereyeCore.replicaCount }}
+  selector:
+    matchLabels:
+      app: supereye-core
+  template:
+    metadata:
+      labels:
+        app: supereye-core
+    spec:
+      containers:
+        - name: supereye-core
+          image: "{{ .Values.supereyeCore.image.repository }}:{{ .Values.supereyeCore.image.tag }}"
+          imagePullPolicy: {{ .Values.supereyeCore.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.supereyeCore.service.port }}
+          envFrom:
+            - configMapRef:
+                name: supereye-core-config
+          env:
+            - name: JAVA_TOOL_OPTIONS
+              value: >-
+                -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005

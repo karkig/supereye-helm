@@ -1,0 +1,18 @@
+emqxServer:
+  replicaCount: 1
+  env:
+    ENABLE_NEW_FEATURE: test
+  image:
+    repository: emqx/emqx
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    ports:
+      mqtt: 1883
+      ws: 8083
+      dashboard: 18083
+    nodePorts:
+      mqtt: 31883
+      ws: 31884
+      dashboard: 31885
+

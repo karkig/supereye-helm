@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: supereye-core-config
+data:
+  PHONE_COLLECTION_NAME: {{ .Values.supereyeCore.env.PHONE_COLLECTION_NAME | quote }}
+  ALERT_COLLECTION_NAME: {{ .Values.supereyeCore.env.ALERT_COLLECTION_NAME | quote }}
+  SENSOR_COLLECTION_NAME: {{ .Values.supereyeCore.env.SENSOR_COLLECTION_NAME | quote }}
+  USER_COLLECTION_NAME: {{ .Values.supereyeCore.env.USER_COLLECTION_NAME | quote }}
+  EMQX_SERVER_HOST: {{ .Values.supereyeCore.env.EMQX_SERVER_HOST | quote }}
+  EMQX_SERVER_PORT: {{ .Values.supereyeCore.service.mqtt | quote }}
+  EMQX_SCHEME: {{ .Values.supereyeCore.env.EMQX_SCHEME | quote }}
