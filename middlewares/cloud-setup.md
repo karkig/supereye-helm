@@ -6,6 +6,7 @@
 
 ### Install
 ````bash
+sudo su
 sudo apt update
 sudo apt install -y git
 curl -sfL https://get.k3s.io | sh -
@@ -13,9 +14,15 @@ curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 echo 'export KUBECONFIG=/etc/rancher/k3s/k3s.yaml' >> ~/.bashrc
 source ~/.bashrc
+echo 'k83 installed successfully'
+cd /opt/
 git clone https://github.com/karkig/supereye-helm.git
-cd cd supereye-helm/supereye-core
+echo 'cloned successfully'
+cd supereye-helm
 helm install supereye-core supereye-core
+helm install emqx emqx
+
+echo 'helm installed successfully'
 
 ````
 

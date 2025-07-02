@@ -1,0 +1,10 @@
+replicaCount: 1
+image:
+  repository: kailashkarki18/alert-dashboard
+  tag: latest
+  pullPolicy: Always
+
+service:
+  type: NodePort
+  port: 80
+  nodePort: 30002

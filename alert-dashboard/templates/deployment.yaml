@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alert-dashboard
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: alert-dashboard
+  template:
+    metadata:
+      labels:
+        app: alert-dashboard
+    spec:
+      containers:
+        - name: alert-dashboard
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          command: [ "nginx", "-g", "daemon off;" ]
