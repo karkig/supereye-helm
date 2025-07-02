@@ -6,12 +6,16 @@
 
 ### Install
 ````bash
+sudo apt update
+sudo apt install -y git
 curl -sfL https://get.k3s.io | sh -
 curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 echo 'export KUBECONFIG=/etc/rancher/k3s/k3s.yaml' >> ~/.bashrc
 source ~/.bashrc
-sudo apt update && sudo apt install zip unzip -y
+git clone https://github.com/karkig/supereye-helm.git
+cd cd supereye-helm/supereye-core
+helm install supereye-core supereye-core
 
 ````
 
