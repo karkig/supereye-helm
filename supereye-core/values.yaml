@@ -8,6 +8,7 @@ supereyeCore:
     USER_COLLECTION_NAME: users-dev
     EMQX_SERVER_HOST: emqx-server
     EMQX_SCHEME: tcp
+    DOOR_EMQX_TOPIC: door-dev
   image:
     repository: kailashkarki18/supereye-core
     tag: latest
