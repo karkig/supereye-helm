@@ -10,4 +10,4 @@ data:
   EMQX_SERVER_HOST: {{ .Values.supereyeCore.env.EMQX_SERVER_HOST | quote }}
   EMQX_SERVER_PORT: {{ .Values.supereyeCore.service.mqtt | quote }}
   EMQX_SCHEME: {{ .Values.supereyeCore.env.EMQX_SCHEME | quote }}
-  DOOR_EMQX_TOPIC: { { .Values.supereyeCore.env.DOOR_EMQX_TOPIC | quote } }
+  DOOR_EMQX_TOPIC: {{ .Values.supereyeCore.env.DOOR_EMQX_TOPIC | quote }}
