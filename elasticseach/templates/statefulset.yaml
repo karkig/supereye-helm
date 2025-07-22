@@ -26,5 +26,6 @@ spec:
               mountPath: {{ .Values.elasticsearch.storage.mountPath }}
       volumes:
         - name: elasticsearch-storage
-          persistentVolumeClaim:
-            claimName: elasticsearch-pvc
+          hostPath:
+            path: /mnt/elasticsearch-data
+            type: Directory
