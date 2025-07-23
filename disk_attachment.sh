@@ -8,6 +8,7 @@ ZONE="us-central1-a"
 echo "Attaching persistent disk..."
 gcloud compute instances attach-disk $(hostname) \
   --disk=${DISK_NAME} \
+  --device-name=$DISK_NAME \
   --zone=${ZONE} \
   --quiet || echo "Disk might already be attached."
 
@@ -27,6 +28,7 @@ mkdir -p $MOUNT_PATH
 # Add to /etc/fstab using UUID
 UUID=$(blkid -s UUID -o value $DEVICE_PATH)
 grep -q "$UUID" /etc/fstab || echo "UUID=$UUID $MOUNT_PATH ext4 discard,defaults,nofail 0 2" >> /etc/fstab
-
+sudo systemctl daemon-reload
 mount -a
 chmod 777 $MOUNT_PATH
+
