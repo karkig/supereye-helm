@@ -1,5 +1,5 @@
 sudo su
-sh disk_attachment.sh
+#sh disk_attachment.sh
 curl -sfL https://get.k3s.io | sh -
 curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 echo 'export KUBECONFIG=/etc/rancher/k3s/k3s.yaml' | sudo tee /etc/profile.d/k3s.sh
@@ -11,7 +11,7 @@ echo 'export KUBECONFIG=/etc/rancher/k3s/k3s.yaml' >> ~/.bashrc
 echo 'k83 installed successfully'
 helm install supereye-core supereye-core
 helm install emqx emqx
-helm install elasticsearch elasticsearch
+#helm install elasticsearch elasticsearch
 helm install alert-dashboard alert-dashboard
 echo 'helm installed successfully'
 source /etc/profile
