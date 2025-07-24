@@ -11,6 +11,7 @@ echo 'export KUBECONFIG=/etc/rancher/k3s/k3s.yaml' >> ~/.bashrc
 echo 'k83 installed successfully'
 helm install supereye-core supereye-core
 helm install emqx emqx
+helm install elasticsearch elasticsearch
 helm install alert-dashboard alert-dashboard
 echo 'helm installed successfully'
 source /etc/profile

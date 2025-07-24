@@ -21,6 +21,15 @@ spec:
               name: http
             - containerPort: 9300
               name: transport
+          env:
+            - name: discovery.type
+              value: "single-node"
+            - name: xpack.ml.enabled
+              value: "false"
+            - name: xpack.security.enabled
+              value: "false"
+            - name: xpack.watcher.enabled
+              value: "false"
           volumeMounts:
             - name: elasticsearch-storage
               mountPath: {{ .Values.elasticsearch.storage.mountPath }}

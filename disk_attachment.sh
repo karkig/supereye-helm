@@ -31,4 +31,7 @@ grep -q "$UUID" /etc/fstab || echo "UUID=$UUID $MOUNT_PATH ext4 discard,defaults
 sudo systemctl daemon-reload
 mount -a
 chmod 777 $MOUNT_PATH
+sudo sysctl -w vm.max_map_count=262144
+echo "vm.max_map_count=262144" | sudo tee -a /etc/sysctl.conf
+sudo sysctl -p
 
