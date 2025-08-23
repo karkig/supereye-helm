@@ -34,8 +34,8 @@ echo "[INFO] Applying bashrc changes..."
 source /root/.bashrc || { echo "[ERROR] Failed to source .bashrc"; exit 1; }
 
 # Set KUBECONFIG explicitly for current session
-#echo "[INFO] Exporting KUBECONFIG for current session..."
-#export KUBECONFIG=/etc/rancher/k3s/k3s.yaml || { echo "[ERROR] Failed to export KUBECONFIG"; exit 1; }
+echo "[INFO] Exporting KUBECONFIG for current session..."
+export KUBECONFIG=/etc/rancher/k3s/k3s.yaml || { echo "[ERROR] Failed to export KUBECONFIG"; exit 1; }
 
 sleep 5
 
