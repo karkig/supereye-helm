@@ -40,6 +40,22 @@ else
   echo "Disk is not attached to any instance."
 fi
 
+# Step 2: Wait until disk is detached (users field is empty)
+echo "Waiting for disk to be fully detached..."
+while true; do
+  USERS=$(gcloud compute disks describe "$DISK_NAME" \
+    --zone="$ZONE" \
+    --format="value(users)")
+
+  if [ -z "$USERS" ]; then
+    echo "Disk successfully detached."
+    break
+  fi
+
+  echo "Disk still in use. Waiting 5 seconds..."
+  sleep 3
+done
+
 echo "[$(date)] Attaching persistent disk..."
 gcloud compute instances attach-disk "$(hostname)" \
   --disk="${DISK_NAME}" \
