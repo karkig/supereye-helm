@@ -1,61 +1,76 @@
 #!/bin/bash
 
-# Name of the Google Cloud persistent disk to attach
+# Enable error handling
+set -e  # Exit immediately if a command exits with a non-zero status
+set -o pipefail  # Ensure pipeline errors are caught
+
+# Log file
+LOG_FILE="/var/log/elasticsearch-disk-setup.log"
+
+# Redirect stdout and stderr to log file
+exec > >(tee -a "$LOG_FILE") 2>&1
+
 DISK_NAME="elasticsearch-disk"
-
-# Path to the disk device (Google Cloud creates symlinks under /dev/disk/by-id)
 DEVICE_PATH="/dev/disk/by-id/google-${DISK_NAME}"
-
-# Directory where the disk will be mounted
 MOUNT_PATH="/mnt/elasticsearch-data"
-
-# Zone where your VM instance and disk are located
 ZONE="us-central1-a"
 
-# Step 1: Attach the persistent disk to the current instance
-echo "Attaching persistent disk..."
-gcloud compute instances attach-disk $(hostname) \
-  --disk=${DISK_NAME} \
-  --device-name=$DISK_NAME \
-  --zone=${ZONE} \
-  --quiet || echo "Disk might already be attached."
+echo "[$(date)] Starting disk de-attachemnt script..."
 
-# Step 2: Wait until the device path becomes available
-echo "Waiting for device to be ready..."
-while [ ! -e $DEVICE_PATH ]; do
+# Function for error handling
+error_exit() {
+    echo "[$(date)] ERROR: $1"
+    exit 1
+}
+# Get the instance URL using gcloud
+INSTANCE_URL=$(gcloud compute disks describe "$DISK_NAME" \
+  --zone="$ZONE" \
+  --format="value(users)")
+# Extract the instance name from the URL (last part after '/')
+OLD_INSTANCE_NAME=$(basename "$INSTANCE_URL")
+
+# Check if the disk is attached to an old instance
+if [ -n "$OLD_INSTANCE_NAME" ]; then
+  echo "Disk is attached to: $OLD_INSTANCE_NAME. Detaching..."
+  gcloud compute instances detach-disk "$OLD_INSTANCE_NAME" \
+    --disk="$DISK_NAME" \
+    --zone="$ZONE" \
+    --quiet || error_exit "Failed to de attach dist  ${DISK_NAME} from instant  ${OLD_INSTANCE_NAME}"
+else
+  echo "Disk is not attached to any instance."
+fi
+
+echo "[$(date)] Attaching persistent disk..."
+gcloud compute instances attach-disk "$(hostname)" \
+  --disk="${DISK_NAME}" \
+  --device-name="$DISK_NAME" \
+  --zone="${ZONE}" \
+  --quiet || error_exit "Failed to attach disk ${DISK_NAME}"
+
+echo "[$(date)] Waiting for device to be ready..."
+while [ ! -e "$DEVICE_PATH" ]; do
   sleep 2
 done
 
-# Step 3: Check if the disk is already formatted
-# If not, format the disk with the ext4 filesystem
-if ! blkid $DEVICE_PATH; then
-  echo "Formatting disk..."
-  mkfs.ext4 -F $DEVICE_PATH
+# Format the disk only if not already formatted
+if ! blkid "$DEVICE_PATH"; then
+  echo "[$(date)] Formatting disk..."
+  mkfs.ext4 -F "$DEVICE_PATH" || error_exit "Failed to format disk ${DEVICE_PATH}"
 fi
 
-# Step 4: Create the mount point directory if it doesn't exist
-mkdir -p $MOUNT_PATH
+mkdir -p "$MOUNT_PATH" || error_exit "Failed to create mount directory"
 
-# Step 5: Get the UUID of the disk for persistent mounting in /etc/fstab
-UUID=$(blkid -s UUID -o value $DEVICE_PATH)
+# Add to /etc/fstab using UUID
+UUID=$(blkid -s UUID -o value "$DEVICE_PATH") || error_exit "Failed to get UUID of ${DEVICE_PATH}"
 
-# Add an entry to /etc/fstab only if it doesn't already exist
 grep -q "$UUID" /etc/fstab || echo "UUID=$UUID $MOUNT_PATH ext4 discard,defaults,nofail 0 2" >> /etc/fstab
 
-# Reload systemd daemon in case any mount changes were made
-sudo systemctl daemon-reload
+sudo systemctl daemon-reload || error_exit "Failed to reload systemd daemon"
+mount -a || error_exit "Failed to mount filesystem"
+chmod 777 "$MOUNT_PATH" || error_exit "Failed to set permissions on ${MOUNT_PATH}"
 
-# Step 6: Mount all filesystems as per /etc/fstab
-mount -a
+sudo sysctl -w vm.max_map_count=262144 || error_exit "Failed to set vm.max_map_count"
+echo "vm.max_map_count=262144" | sudo tee -a /etc/sysctl.conf || error_exit "Failed to update sysctl.conf"
+sudo sysctl -p || error_exit "Failed to reload sysctl settings"
 
-# Set full permissions on the mount path (for Elasticsearch to write data)
-chmod 777 $MOUNT_PATH
-
-# Step 7: Increase vm.max_map_count (required by Elasticsearch for mmap operations)
-sudo sysctl -w vm.max_map_count=262144
-
-# Make the vm.max_map_count setting permanent by adding it to sysctl.conf
-echo "vm.max_map_count=262144" | sudo tee -a /etc/sysctl.conf
-
-# Reload sysctl settings
-sudo sysctl -p
+echo "[$(date)] Disk setup completed successfully!"

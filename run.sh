@@ -1,32 +1,50 @@
-sudo su
+#!/bin/bash
+set -euo pipefail  # Exit on error, undefined variable, or pipeline failure
+LOG_FILE="/var/log/setup_script.log"
 
-# Attach disk (your custom script)
-sh disk_attachment.sh
+# Redirect stdout and stderr to log file
+exec > >(tee -a "$LOG_FILE") 2>&1
+
+# Trap function for errors
+trap 'echo "[ERROR] Command failed at line $LINENO. Exit status: $?"; exit 1' ERR
+
+echo "[INFO] Starting setup process..."
+
+# Switch to root user
+echo "[INFO] Switching to root user..."
+sudo su || { echo "[ERROR] Failed to switch to root user"; exit 1; }
+
+# Attach disk using custom script
+echo "[INFO] Attaching disk..."
+bash disk_attachment.sh || { echo "[ERROR] Disk attachment failed"; exit 1; }
 
 # Install K3s
-curl -sfL https://get.k3s.io | sh -
+echo "[INFO] Installing K3s..."
+curl -sfL https://get.k3s.io | bash - || { echo "[ERROR] Failed to install K3s"; exit 1; }
 
 # Install Helm
-curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+echo "[INFO] Installing Helm..."
+curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash || { echo "[ERROR] Failed to install Helm"; exit 1; }
 
 # Set KUBECONFIG for root user permanently
-echo 'export KUBECONFIG=/etc/rancher/k3s/k3s.yaml' | tee -a /root/.bashrc
+echo "[INFO] Setting KUBECONFIG for root..."
+echo 'export KUBECONFIG=/etc/rancher/k3s/k3s.yaml' | tee -a /root/.bashrc || { echo "[ERROR] Failed to update root .bashrc"; exit 1; }
 
 # Apply changes in current shell
-source /root/.bashrc
+echo "[INFO] Applying bashrc changes..."
+source /root/.bashrc || { echo "[ERROR] Failed to source .bashrc"; exit 1; }
 
-# Optional: also set it for current session explicitly
-export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+# Set KUBECONFIG explicitly for current session
+echo "[INFO] Exporting KUBECONFIG for current session..."
+export KUBECONFIG=/etc/rancher/k3s/k3s.yaml || { echo "[ERROR] Failed to export KUBECONFIG"; exit 1; }
 
 sleep 5
 
-# If you also want for normal user (not just root), uncomment below:
-# echo 'export KUBECONFIG=/etc/rancher/k3s/k3s.yaml' >> ~/.bashrc
-
 # Helm installations
-helm install supereye-core supereye-core
-helm install emqx emqx
-helm install elasticsearch elasticsearch
-helm install alert-dashboard alert-dashboard
+echo "[INFO] Installing Helm charts..."
+helm install supereye-core supereye-core || { echo "[ERROR] Helm install for supereye-core failed"; exit 1; }
+helm install emqx emqx || { echo "[ERROR] Helm install for emqx failed"; exit 1; }
+helm install elasticsearch elasticsearch || { echo "[ERROR] Helm install for elasticsearch failed"; exit 1; }
+helm install alert-dashboard alert-dashboard || { echo "[ERROR] Helm install for alert-dashboard failed"; exit 1; }
 
-echo 'Helm installed successfully'
+echo "[INFO] Helm installed successfully"
