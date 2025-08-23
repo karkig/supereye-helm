@@ -45,5 +45,5 @@ helm install supereye-core supereye-core || { echo "[ERROR] Helm install for sup
 helm install emqx emqx || { echo "[ERROR] Helm install for emqx failed"; exit 1; }
 helm install elasticsearch elasticsearch || { echo "[ERROR] Helm install for elasticsearch failed"; exit 1; }
 helm install alert-dashboard alert-dashboard || { echo "[ERROR] Helm install for alert-dashboard failed"; exit 1; }
-
+source /root/.bashrc
 echo "[INFO] Helm installed successfully"
