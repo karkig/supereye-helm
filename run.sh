@@ -16,7 +16,7 @@ echo "[INFO] Switching to root user..."
 # Attach disk using custom script
 echo "[INFO] Attaching disk..."
 bash disk_attachment.sh || { echo "[ERROR] Disk attachment failed"; exit 1; }
-
+sleep 10
 # Install K3s
 echo "[INFO] Installing K3s..."
 curl -sfL https://get.k3s.io | bash - || { echo "[ERROR] Failed to install K3s"; exit 1; }

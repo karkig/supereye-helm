@@ -39,7 +39,7 @@ if [ -n "$OLD_INSTANCE_NAME" ]; then
 else
   echo "Disk is not attached to any instance."
 fi
-
+ sleep 10
 # Step 2: Wait until disk is detached (users field is empty)
 echo "Waiting for disk to be fully detached..."
 while true; do
@@ -65,7 +65,7 @@ gcloud compute instances attach-disk "$(hostname)" \
 
 echo "[$(date)] Waiting for device to be ready..."
 while [ ! -e "$DEVICE_PATH" ]; do
-  sleep 2
+  sleep 20
 done
 
 # Format the disk only if not already formatted
